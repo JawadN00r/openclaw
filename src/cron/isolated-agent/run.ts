@@ -44,7 +44,7 @@ import type { AgentDefaultsConfig } from "../../config/types.js";
 import { registerAgentRunContext } from "../../infra/agent-events.js";
 import { deliverOutboundPayloads } from "../../infra/outbound/deliver.js";
 import { resolveAgentOutboundIdentity } from "../../infra/outbound/identity.js";
-import { logWarn } from "../../logger.js";
+import { logInfo, logWarn } from "../../logger.js";
 import { buildAgentMainSessionKey, normalizeAgentId } from "../../routing/session-key.js";
 import {
   buildSafeExternalPrompt,
@@ -598,6 +598,9 @@ export async function runCronIsolatedAgentTurn(params: {
               ? [{ text: synthesizedText }]
               : [];
         if (payloadsForDelivery.length > 0) {
+          logInfo(
+            `[cron:${params.job.id}] delivering ${payloadsForDelivery.length} payload(s) to ${resolvedDelivery.channel}:${resolvedDelivery.to}`,
+          );
           const deliveryResults = await deliverOutboundPayloads({
             cfg: cfgWithAgentDefaults,
             channel: resolvedDelivery.channel,
